@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>New Year Bingo Caller</title>
+
+<style>
+:root {
+  --bg-dark: #05010d;
+  --gold: #ffd700;
+  --neon: #ff4ecd;
+}
+
+* { box-sizing: border-box; font-family: "Segoe UI", sans-serif; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at bottom, #12002f, var(--bg-dark));
+  color: white;
+  overflow: hidden;
+}
+
+/* FLOATING ORBS (calm background) */
+.orb {
+  position: absolute;
+  bottom: -100px;
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle, var(--gold), transparent 70%);
+  border-radius: 50%;
+  opacity: 0.35;
+  animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+  to { transform: translateY(-120vh); }
+}
+
+/* LAYOUT */
+.container {
+  position: relative;
+  z-index: 2;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+h1 {
+  color: var(--gold);
+  text-shadow: 0 0 20px var(--gold);
+  margin-bottom: 10px;
+}
+
+h2 {
+  color: var(--gold);
+  text-shadow: 0 0 20px var(--gold);
+  margin-bottom: 10px;
+}
+
+/* BALL */
+.ball {
+  width: clamp(200px, 40vw, 300px);
+  height: clamp(200px, 40vw, 300px);
+  border-radius: 50%;
+  background: radial-gradient(circle at top, white, var(--neon));
+  box-shadow: 0 0 50px var(--neon), inset 0 0 30px white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+/* SLOT LETTER */
+.slot {
+  height: 60px;
+  overflow: hidden;
+}
+
+.slot-inner {
+  display: flex;
+  flex-direction: column;
+  animation: none;
+}
+
+.slot.spin .slot-inner {
+  animation: slotSpin 0.9s ease-in-out;
+}
+
+@keyframes slotSpin {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-300px); }
+}
+
+.slot-letter {
+  font-size: clamp(2.5rem, 6vw, 3.5rem);
+  font-weight: bold;
+  color: black;
+  height: 60px;
+  text-align: center;
+}
+
+.ball-number {
+  font-size: clamp(4rem, 10vw, 6rem);
+  color: black;
+  font-weight: bold;
+}
+
+/* CONTROLS */
+.controls {
+  margin: 10px 0;
+}
+
+button {
+  padding: 14px 28px;
+  margin: 6px;
+  border-radius: 999px;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: bold;
+  background: linear-gradient(135deg, var(--gold), #ec832c);
+  box-shadow: 0 0 20px rgba(243, 81, 32, 0.6);
+}
+
+/* BOARD */
+.board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 750px;
+}
+
+.column {
+  background: rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 8px;
+  text-align: center;
+}
+
+.column h2 { color: var(--gold); }
+
+.number {
+  border-radius: 999px;
+  margin: 4px 0;
+  padding: 4px;
+  background: rgba(255,255,255,0.2);
+}
+
+.number.called {
+  background: var(--neon);
+  color: black;
+  box-shadow: 0 0 10px var(--neon);
+}
+
+/* BINGO */
+#bingoOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+#bingoOverlay.active {
+  display: flex;
+}
+
+.bingoText {
+  font-size: clamp(4rem, 12vw, 10rem);
+  color: var(--gold);
+  text-shadow: 0 0 40px var(--gold);
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  50% { transform: translateY(-30px); }
+}
+
+canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="fireworks"></canvas>
+
+<!-- AUDIO (replace with your voice files) -->
+<audio id="callAudio" src="call.mp3"></audio>
+<audio id="bingoAudio" src="bingo.mp3"></audio>
+
+<div class="container">
+  <h1>🎆 2026 Soria Bingo! 🎆</h1>
+  <h2> Happy New Year!! </h2>
+
+  <div class="ball">
+    <div id="slot" class="slot">
+      <div id="slotInner" class="slot-inner">
+        <div class="slot-letter">B</div>
+        <div class="slot-letter">I</div>
+        <div class="slot-letter">N</div>
+        <div class="slot-letter">G</div>
+        <div class="slot-letter">O</div>
+      </div>
+    </div>
+    <div id="ballNumber" class="ball-number">—</div>
+  </div>
+
+  <div class="controls">
+    <button onclick="callNumber()">Call</button>
+    <button onclick="undoLast()">Undo</button>
+    <button onclick="triggerBingo()">BINGO</button>
+  </div>
+
+  <div id="board" class="board"></div>
+</div>
+
+<div id="bingoOverlay">
+  <div class="bingoText">B I N G O</div>
+</div>
+
+<script>
+/* BACKGROUND ORBS */
+for (let i=0;i<18;i++){
+  const o=document.createElement("div");
+  o.className="orb";
+  o.style.left=Math.random()*100+"vw";
+  o.style.animationDuration=15+Math.random()*20+"s";
+  document.body.appendChild(o);
+}
+
+const ranges={B:[1,15],I:[16,30],N:[31,45],G:[46,60],O:[61,75]};
+let available=[...Array(75)].map((_,i)=>i+1);
+let called=[];
+
+const board=document.getElementById("board");
+for(let l in ranges){
+  const c=document.createElement("div");
+  c.className="column";
+  c.innerHTML=`<h2>${l}</h2>`;
+  for(let i=ranges[l][0];i<=ranges[l][1];i++){
+    const n=document.createElement("div");
+    n.className="number";
+    n.id=`num-${i}`;
+    n.textContent=i;
+    c.appendChild(n);
+  }
+  board.appendChild(c);
+}
+
+const slot=document.getElementById("slot");
+const slotInner=document.getElementById("slotInner");
+const numberEl=document.getElementById("ballNumber");
+
+function getLetter(n){ return n<=15?"B":n<=30?"I":n<=45?"N":n<=60?"G":"O"; }
+
+function callNumber(){
+  if(!available.length) return;
+
+  slot.classList.add("spin");
+  let fake=setInterval(()=>{
+    numberEl.textContent=Math.floor(Math.random()*75)+1;
+  },80);
+
+  setTimeout(()=>{
+    clearInterval(fake);
+    slot.classList.remove("spin");
+
+    const idx=Math.floor(Math.random()*available.length);
+    const num=available.splice(idx,1)[0];
+    called.push(num);
+
+    const letter=getLetter(num);
+    slotInner.style.transform=`translateY(${-["B","I","N","G","O"].indexOf(letter)*60}px)`;
+    numberEl.textContent=num;
+
+    document.getElementById(`num-${num}`).classList.add("called");
+    document.getElementById("callAudio").play();
+  },900);
+}
+
+function undoLast(){
+  if(!called.length) return;
+  const n=called.pop();
+  available.push(n);
+  document.getElementById(`num-${n}`).classList.remove("called");
+}
+
+function triggerBingo(){
+  document.getElementById("bingoOverlay").classList.add("active");
+  document.getElementById("bingoAudio").play();
+  startFireworks();
+  setTimeout(resetGame,6000);
+}
+
+function resetGame(){
+  document.getElementById("bingoOverlay").classList.remove("active");
+  available=[...Array(75)].map((_,i)=>i+1);
+  called=[];
+  document.querySelectorAll(".number").forEach(n=>n.classList.remove("called"));
+  slotInner.style.transform="translateY(0)";
+  numberEl.textContent="—";
+}
+
+/* FIREWORKS */
+const canvas=document.getElementById("fireworks");
+const ctx=canvas.getContext("2d");
+canvas.width=innerWidth; canvas.height=innerHeight;
+let particles=[];
+
+function startFireworks(){
+  for(let i=0;i<12;i++) explode();
+}
+
+function explode(){
+  const x=Math.random()*canvas.width;
+  const y=Math.random()*canvas.height/2;
+  for(let i=0;i<60;i++){
+    particles.push({x,y,vx:(Math.random()-.5)*7,vy:(Math.random()-.5)*7,life:120});
+  }
+}
+
+(function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy; p.life--;
+    ctx.fillStyle=`rgba(255,215,0,${p.life/120})`;
+    ctx.beginPath(); ctx.arc(p.x,p.y,2.5,0,Math.PI*2); ctx.fill();
+  });
+  particles=particles.filter(p=>p.life>0);
+  requestAnimationFrame(animate);
+})();
+</script>
+
+</body>
+</html>
