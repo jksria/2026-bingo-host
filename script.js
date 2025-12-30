@@ -103,9 +103,18 @@ document.getElementById("newGameBtn").onclick = () => {
   document.getElementById("victoryScreen").classList.remove("active");
   resetGame();
 };
+  
+const resizeBtn = document.getElementById("resizeToggle");
+const app = document.getElementById("app");
 
+resizeBtn.addEventListener("click", () => {
+  app.classList.toggle("compact");
+  resizeBtn.textContent = app.classList.contains("compact")
+    ? "Normal View"
+    : "Compact View";
 
 }); // 👈 THIS closes DOMContentLoaded
+
 
 
 
