@@ -112,8 +112,10 @@ resizeBtn.addEventListener("click", () => {
   resizeBtn.textContent = app.classList.contains("compact")
     ? "Normal View"
     : "Compact View";
+});
 
 }); // 👈 THIS closes DOMContentLoaded
+
 
 
 
