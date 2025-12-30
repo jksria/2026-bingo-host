@@ -1,0 +1,158 @@
+#startupScreen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.startup-content {
+  text-align: center;
+  color: white;
+}
+
+.startup-content h1 {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  margin-bottom: 10px;
+  letter-spacing: 4px;
+}
+
+.startup-content p {
+  opacity: 0.8;
+  margin-bottom: 30px;
+}
+
+#startGameBtn {
+  font-size: 1.4rem;
+  padding: 18px 40px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ffcc00, #ff5e00);
+  color: black;
+  font-weight: bold;
+  box-shadow: 0 0 25px rgba(255, 200, 0, 0.6);
+}
+
+#startGameBtn:active {
+  transform: scale(0.97);
+}
+
+/* -----PLAYER PANEL----- */
+
+#playerPanel {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  width: 280px;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 15px;
+  border-radius: 20px;
+  z-index: 1000;
+}
+
+#playerPanel h3 {
+  margin-top: 0;
+  text-align: center;
+}
+
+.add-player,
+.bet-controls {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+#playerPanel input {
+  flex: 1;
+  padding: 6px;
+  border-radius: 8px;
+  border: none;
+}
+
+#playerPanel button {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+#playerList {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.player {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.player span {
+  font-size: 0.9rem;
+}
+
+#winnerBtn {
+  margin-top: 10px;
+  width: 100%;
+}
+
+#victoryScreen {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top, #1a1a2e, #000);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+#victoryScreen.active {
+  display: flex;
+}
+
+.victory-card {
+  text-align: center;
+  padding: 40px 50px;
+  border-radius: 30px;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 60px rgba(255,215,0,0.6);
+  animation: popIn 0.4s ease-out;
+}
+
+.victory-card h1 {
+  font-size: clamp(36px, 6vw, 64px);
+  margin-bottom: 10px;
+}
+
+.victory-card h2 {
+  font-size: clamp(28px, 5vw, 48px);
+  color: gold;
+  margin: 10px 0;
+}
+
+.victory-card p {
+  font-size: 22px;
+  margin-bottom: 30px;
+}
+
+.victory-card button {
+  font-size: 20px;
+  padding: 14px 32px;
+  border-radius: 40px;
+  border: none;
+  background: gold;
+  color: black;
+  font-weight: bold;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
