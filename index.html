@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="styles.css">
 <title>New Year Bingo Caller</title>
 
 <style>
@@ -190,10 +191,23 @@ canvas {
   pointer-events: none;
   z-index: 9;
 }
+
 </style>
 </head>
 
 <body>
+
+<div id="startupScreen">
+  <div class="startup-content">
+    <h1> Welcome to Bingo Caller, made by yours truly!</h1>
+    <p>Are we Ready?</p>
+    <button id="startGameBtn">Start Game</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+
+<button id="hostToggle">⚙️ Host</button>
 
 <canvas id="fireworks"></canvas>
 
@@ -266,29 +280,35 @@ const numberEl=document.getElementById("ballNumber");
 
 function getLetter(n){ return n<=15?"B":n<=30?"I":n<=45?"N":n<=60?"G":"O"; }
 
-function callNumber(){
-  if(!available.length) return;
+function callNumber() {
+  if (!available.length) return;
+
+  // 🔊 PLAY SOUND HERE (this is the user click moment)
+  playSound("callSound");
 
   slot.classList.add("spin");
-  let fake=setInterval(()=>{
-    numberEl.textContent=Math.floor(Math.random()*75)+1;
-  },80);
 
-  setTimeout(()=>{
+  let fake = setInterval(() => {
+    numberEl.textContent = Math.floor(Math.random() * 75) + 1;
+  }, 80);
+
+  setTimeout(() => {
     clearInterval(fake);
     slot.classList.remove("spin");
 
-    const idx=Math.floor(Math.random()*available.length);
-    const num=available.splice(idx,1)[0];
+    playSound("popSound");
+
+    const idx = Math.floor(Math.random() * available.length);
+    const num = available.splice(idx, 1)[0];
     called.push(num);
 
-    const letter=getLetter(num);
-    slotInner.style.transform=`translateY(${-["B","I","N","G","O"].indexOf(letter)*60}px)`;
-    numberEl.textContent=num;
+    const letter = getLetter(num);
+    slotInner.style.transform =
+      `translateY(${-["B","I","N","G","O"].indexOf(letter) * 60}px)`;
 
+    numberEl.textContent = num;
     document.getElementById(`num-${num}`).classList.add("called");
-    document.getElementById("callAudio").play();
-  },900);
+  }, 2900);
 }
 
 function undoLast(){
@@ -298,12 +318,17 @@ function undoLast(){
   document.getElementById(`num-${n}`).classList.remove("called");
 }
 
-function triggerBingo(){
+function triggerBingo() {
   document.getElementById("bingoOverlay").classList.add("active");
-  document.getElementById("bingoAudio").play();
+
+  // 🔊 use centralized sound handler
+  playSound("bingoSound");
+
   startFireworks();
-  setTimeout(resetGame,6000);
+
+  setTimeout(resetGame, 6000);
 }
+
 
 function resetGame(){
   document.getElementById("bingoOverlay").classList.remove("active");
@@ -343,6 +368,38 @@ function explode(){
   requestAnimationFrame(animate);
 })();
 </script>
+
+<div id="victoryScreen">
+  <div class="victory-card">
+    <h1>🎉 BINGO! 🎉</h1>
+    <h2 id="winnerName">Winner</h2>
+    <p id="winnerAmount"></p>
+
+    <button id="newGameBtn">Start New Game</button>
+  </div>
+</div>
+
+<div id="playerPanel">
+  <h3>Players</h3>
+
+  <div class="add-player">
+    <input id="playerNameInput" placeholder="Player name" />
+    <button id="addPlayerBtn">Add</button>
+  </div>
+
+  <ul id="playerList"></ul>
+
+  <div class="bet-controls">
+    <input id="betAmount" type="number" placeholder="Bet amount" />
+    <button id="addBetBtn">Add Bet to All</button>
+  </div>
+
+  <div id="potTotal">Pot: $0</div>
+</div>
+
+<audio id="callSound" src="assets/bingo.mp3" preload="auto"></audio>
+<audio id="bingoSound" src="assets/bingo2.mp3" preload="auto"></audio>
+<audio id="popSound" src="assets/pop.mp3" preload="auto"></audio>
 
 </body>
 </html>
