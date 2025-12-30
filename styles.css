@@ -156,3 +156,18 @@
   from { transform: scale(0.85); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
+
+#app {
+  transform-origin: top center;
+  transition: transform 0.3s ease;
+}
+
+/* Compact mode */
+.compact {
+  transform: scale(0.85);
+}
+
+/* Optional: smaller text only in compact mode */
+.compact .player-name,
+.compact .bet-amount {
+  font-size: 0.9em;
